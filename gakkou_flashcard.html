@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>がっこうのいちにち｜フラッシュカード</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', -apple-system, sans-serif;
+  background: #f0f7f4;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.wrap { width: 100%; max-width: 420px; }
+
+/* スタート画面 */
+.start-screen {
+  text-align: center;
+  background: #fff;
+  border-radius: 24px;
+  padding: 2.5rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+.start-title { font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; }
+.start-sub { font-size: 14px; color: #888; margin-bottom: 1.5rem; }
+.start-info { font-size: 15px; color: #555; line-height: 1.7; margin-bottom: 2rem; background: #f0f7f4; border-radius: 14px; padding: 1rem; }
+.start-btn {
+  background: #1D9E75;
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 18px 52px;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+  transition: transform 0.1s, background 0.2s;
+}
+.start-btn:active { transform: scale(0.97); background: #158f68; }
+
+/* メイン */
+.main { display: none; }
+.prog-bar { height: 7px; background: #d4ece5; border-radius: 4px; margin-bottom: 8px; }
+.prog-fill { height: 100%; background: #1D9E75; border-radius: 4px; transition: width 0.4s ease; }
+.counter { font-size: 13px; color: #999; text-align: center; margin-bottom: 12px; }
+
+/* カード */
+.card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 1.8rem 1.5rem 1.5rem;
+  text-align: center;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  transition: opacity 0.25s ease;
+  position: relative;
+}
+.card.fade { opacity: 0; }
+
+.speaker-tag {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0f7f4;
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 13px;
+  color: #1D9E75;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.avatar-icon { font-size: 18px; }
+
+.jp-text {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.6;
+  padding: 0 0.5rem;
+  padding-top: 1.5rem;
+}
+.zh-text {
+  font-size: 20px;
+  color: #1D9E75;
+  font-weight: 600;
+}
+
+/* 音声ボタン */
+.speak-btn {
+  background: #e8f7f1;
+  border: 2px solid #5DCAA5;
+  border-radius: 999px;
+  padding: 8px 22px;
+  font-size: 15px;
+  cursor: pointer;
+  color: #085041;
+  font-family: inherit;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.speak-btn:active { background: #9FE1CB; }
+.speak-btn.playing { background: #9FE1CB; }
+
+/* コントロール */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.ctrl-btn {
+  background: #fff;
+  border: 1.5px solid #d0e8e0;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 15px;
+  cursor: pointer;
+  font-family: inherit;
+  color: #333;
+  transition: background 0.15s;
+}
+.ctrl-btn:active { background: #f0f7f4; transform: scale(0.97); }
+.ctrl-btn:disabled { opacity: 0.35; cursor: default; }
+.play-btn {
+  background: #1D9E75;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  flex: 1;
+  transition: background 0.15s;
+}
+.play-btn:active { background: #158f68; }
+
+/* 速度 */
+.speed-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #999;
+}
+.speed-row select {
+  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: 1.5px solid #d0e8e0;
+  background: #fff;
+  font-family: inherit;
+  color: #333;
+}
+
+.voice-note { text-align: center; font-size: 12px; color: #bbb; margin-top: 8px; }
+
+/* 完了画面 */
+.done-screen {
+  display: none;
+  text-align: center;
+  background: #fff;
+  border-radius: 24px;
+  padding: 2.5rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+.done-screen .emoji { font-size: 52px; margin-bottom: 12px; }
+.done-screen h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color: #1a1a1a; }
+.done-screen p { font-size: 15px; color: #666; margin-bottom: 1.5rem; }
+.restart-btn {
+  background: #1D9E75;
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 40px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+}
+.restart-btn:active { transform: scale(0.97); background: #158f68; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- スタート画面 -->
+  <div class="start-screen" id="start-screen">
+    <div style="font-size:48px;margin-bottom:12px;">🏫</div>
+    <div class="start-title">がっこうのいちにち</div>
+    <div class="start-sub">學校的一天</div>
+    <div class="start-info">
+      🔊 音声付きフラッシュカード<br>
+      カードを見ながら日本語を<br>
+      きいてれんしゅうしよう！
+    </div>
+    <button class="start-btn" onclick="startApp()">▶ スタート</button>
+  </div>
+
+  <!-- メイン -->
+  <div class="main" id="main">
+    <div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
+    <p class="counter" id="counter">1 / 7</p>
+
+    <div class="card" id="card">
+      <div class="speaker-tag" id="speaker-tag">
+        <span class="avatar-icon" id="avatar-icon"></span>
+        <span id="speaker-name"></span>
+      </div>
+      <div class="jp-text" id="jp"></div>
+      <div class="zh-text" id="zh"></div>
+      <button class="speak-btn" id="speak-btn" onclick="speakCurrent()">🔊 きく</button>
+    </div>
+
+    <div class="controls">
+      <button class="ctrl-btn" id="prev-btn" onclick="prev()">◀ 前へ</button>
+      <button class="play-btn" id="play-btn" onclick="togglePlay()">▶ 自動再生</button>
+      <button class="ctrl-btn" id="next-btn" onclick="next()">次へ ▶</button>
+    </div>
+
+    <div class="speed-row">
+      <label>よみあげ速度：</label>
+      <select id="speed-sel" onchange="changeSpeed()">
+        <option value="0.7">ゆっくり</option>
+        <option value="0.9" selected>ふつう</option>
+        <option value="1.2">はやい</option>
+      </select>
+    </div>
+    <p class="voice-note">🔊 読み上げが終わってから次へ自動で進みます</p>
+  </div>
+
+  <!-- 完了画面 -->
+  <div class="done-screen" id="done-screen">
+    <div class="emoji">🎉</div>
+    <h2>おわり！</h2>
+    <p>ぜんぶ　きけたね！<br>學完了！</p>
+    <button class="restart-btn" onclick="restart()">🔄 もう一かい</button>
+  </div>
+
+</div>
+<script>
+const cards = [
+  { speaker: "レイ",   avatar: "🧒", jp: "おはようございます！",                                                              zh: "早安！" },
+  { speaker: "はなこ", avatar: "👧", jp: "おはよう！　きょうは　べんとうを　もってきた？",                                  zh: "早！今天有帶便當嗎？" },
+  { speaker: "レイ",   avatar: "🧒", jp: "うん、もってきた！　おかあさんが　つくってくれた。",                               zh: "嗯，有帶！是媽媽做的。" },
+  { speaker: "せんせい", avatar: "👩‍🏫", jp: "みなさん、きょうの　じゅぎょうは　さんすうと　こくごです。じゅんびを　してください。", zh: "大家，今天的課是數學和國語。請做好準備。" },
+  { speaker: "はなこ", avatar: "👧", jp: "レイ、えんぴつを　かして！　わすれちゃった。",                                     zh: "小雷，借我鉛筆！我忘記帶了。" },
+  { speaker: "レイ",   avatar: "🧒", jp: "いいよ！　どうぞ。",                                                                zh: "好呀！給你。" },
+  { speaker: "せんせい", avatar: "👩‍🏫", jp: "では、はじめましょう。",                                                           zh: "那麼，開始吧。" },
+];
+
+let current = 0;
+let playing = false;
+let speakRate = 0.9;
+let jpVoice = null;
+let currentUtt = null;
+
+function loadVoice() {
+  const voices = speechSynthesis.getVoices();
+  jpVoice = voices.find(v => v.lang === 'ja-JP') || voices.find(v => v.lang.startsWith('ja')) || null;
+}
+speechSynthesis.onvoiceschanged = loadVoice;
+loadVoice();
+
+function startApp() {
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+  const u = new SpeechSynthesisUtterance('');
+  speechSynthesis.speak(u);
+  show(0, true);
+}
+
+function speak(text, onEnd) {
+  if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP';
+  u.rate = speakRate;
+  if (jpVoice) u.voice = jpVoice;
+  if (onEnd) u.onend = onEnd;
+  currentUtt = u;
+  speechSynthesis.speak(u);
+}
+
+function speakCurrent() {
+  const btn = document.getElementById('speak-btn');
+  if (btn.classList.contains('playing')) {
+    speechSynthesis.cancel();
+    btn.textContent = '🔊 きく';
+    btn.classList.remove('playing');
+    return;
+  }
+  btn.classList.add('playing');
+  btn.textContent = '⏹ とめる';
+  speak(cards[current].jp, () => {
+    btn.textContent = '🔊 きく';
+    btn.classList.remove('playing');
+  });
+}
+
+function show(i, doSpeak = true, afterSpeak = null) {
+  const card = document.getElementById('card');
+  card.classList.add('fade');
+  setTimeout(() => {
+    const c = cards[i];
+    document.getElementById('speaker-name').textContent = c.speaker;
+    document.getElementById('avatar-icon').textContent = c.avatar;
+    document.getElementById('jp').textContent = c.jp;
+    document.getElementById('zh').textContent = c.zh;
+    document.getElementById('counter').textContent = (i + 1) + ' / ' + cards.length;
+    document.getElementById('prog').style.width = ((i + 1) / cards.length * 100) + '%';
+    document.getElementById('prev-btn').disabled = (i === 0);
+    document.getElementById('next-btn').disabled = (i === cards.length - 1);
+    const speakBtn = document.getElementById('speak-btn');
+    speakBtn.textContent = '🔊 きく';
+    speakBtn.classList.remove('playing');
+    card.classList.remove('fade');
+    if (doSpeak) {
+      speak(c.jp, afterSpeak);
+    }
+  }, 250);
+}
+
+function next() {
+  if (current < cards.length - 1) { current++; show(current); }
+  else { stopPlay(); showDone(); }
+}
+function prev() {
+  if (current > 0) { current--; show(current); }
+}
+function togglePlay() {
+  playing ? stopPlay() : startPlay();
+}
+
+function startPlay() {
+  playing = true;
+  document.getElementById('play-btn').textContent = '⏸ 一時停止';
+  if (current >= cards.length - 1) current = 0;
+  playCard(current);
+}
+
+function playCard(i) {
+  if (!playing) return;
+  current = i;
+  // 読み上げ終了 → 1秒待って次へ
+  show(i, true, () => {
+    if (!playing) return;
+    setTimeout(() => {
+      if (!playing) return;
+      if (current < cards.length - 1) {
+        playCard(current + 1);
+      } else {
+        stopPlay();
+        showDone();
+      }
+    }, 1000);
+  });
+}
+
+function stopPlay() {
+  playing = false;
+  speechSynthesis && speechSynthesis.cancel();
+  document.getElementById('play-btn').textContent = '▶ 自動再生';
+}
+function changeSpeed() {
+  speakRate = parseFloat(document.getElementById('speed-sel').value);
+  if (playing) { stopPlay(); startPlay(); }
+}
+function showDone() {
+  document.getElementById('main').style.display = 'none';
+  document.getElementById('done-screen').style.display = 'block';
+}
+function restart() {
+  current = 0;
+  document.getElementById('done-screen').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+  show(0, true);
+}
+</script>
+</body>
+</html>
