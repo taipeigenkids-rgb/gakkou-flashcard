@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>かぞく フラッシュカード</title>
+<style>
+body{font-family:sans-serif;background:#f5f5f5;margin:0;padding:16px;}
+h1{font-size:18px;font-weight:500;margin:0 0 4px;color:#222;}
+p{font-size:13px;color:#888;margin:0 0 12px;}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+button.reset{font-size:12px;padding:5px 14px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer;color:#555;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;}
+.card{background:#fff;border:2px solid #e0e0e0;border-radius:14px;cursor:pointer;padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform 0.12s,border-color 0.12s;min-height:160px;justify-content:center;-webkit-tap-highlight-color:transparent;}
+.card:hover{border-color:#aaa;transform:translateY(-2px);}
+.card.playing{border-color:#1D9E75;box-shadow:0 0 0 3px rgba(29,158,117,0.2);}
+.card img{width:80px;height:80px;object-fit:contain;}
+.labels{display:flex;flex-direction:column;align-items:center;gap:3px;opacity:0;transform:translateY(5px);transition:opacity 0.18s,transform 0.18s;}
+.card.revealed .labels{opacity:1;transform:translateY(0);}
+.hira{font-size:13px;font-weight:700;color:#222;text-align:center;}
+.zh{font-size:12px;color:#888;text-align:center;}
+</style>
+</head>
+<body>
+<div class="top"><h1>名詞　かぞく　家人</h1><button class="reset" onclick="reset()">リセット</button></div>
+<p>カードをクリックすると文字表示＋音声読み上げ</p>
+<div class="grid" id="grid"></div>
+<script>
+const BASE = "https://taipeigenkids-rgb.github.io/gakkou-flashcard/";
+const DATA = [
+  {hira:"おじいちゃん", zh:"爺爺／阿公", img:"おじいちゃん.gif", wav:"001_琴詠ニア（ノーマル）_おじいちゃん.wav"},
+  {hira:"おばあちゃん", zh:"奶奶／阿嬤", img:"おばあちゃん.gif", wav:"002_琴詠ニア（ノーマル）_おばあちゃん.wav"},
+  {hira:"おとうさん",   zh:"爸爸",       img:"お父さん.gif",     wav:"003_琴詠ニア（ノーマル）_おとうさん.wav"},
+  {hira:"おかあさん",   zh:"媽媽",       img:"お母さん.gif",     wav:"004_琴詠ニア（ノーマル）_おかあさん.wav"},
+  {hira:"おにいちゃん", zh:"哥哥",       img:"おにいちゃん.gif", wav:"005_琴詠ニア（ノーマル）_おにいちゃん.wav"},
+  {hira:"おねえちゃん", zh:"姐姐",       img:"お姉ちゃん.gif",   wav:"006_琴詠ニア（ノーマル）_おねえちゃん.wav"},
+  {hira:"おとうと",     zh:"弟弟",       img:"弟.gif",           wav:"007_琴詠ニア（ノーマル）_おとうと.wav"},
+  {hira:"いもうと",     zh:"妹妹",       img:"妹.gif",           wav:"008_琴詠ニア（ノーマル）_いもうと.wav"},
+  {hira:"ペット",       zh:"寵物",       img:"ペット.gif",       wav:"009_琴詠ニア（ノーマル）_ペット.wav"},
+];
+const g = document.getElementById('grid');
+DATA.forEach(item => {
+  const c = document.createElement('div');
+  c.className = 'card';
+  c.innerHTML = `<img src="${BASE}${encodeURIComponent(item.img)}" alt="${item.hira}"><div class="labels"><div class="hira">${item.hira}</div><div class="zh">${item.zh}</div></div>`;
+  const a = new Audio(BASE + encodeURIComponent(item.wav));
+  c.addEventListener('click', () => {
+    c.classList.add('revealed','playing');
+    a.currentTime = 0; a.play();
+    a.onended = () => c.classList.remove('playing');
+  });
+  g.appendChild(c);
+});
+function reset(){document.querySelectorAll('.card').forEach(c=>c.classList.remove('revealed','playing'));}
+</script>
+</body>
+</html>
