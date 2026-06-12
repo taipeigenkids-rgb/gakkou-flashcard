@@ -46,10 +46,10 @@ DATA.forEach(item => {
   const c = document.createElement('div');
   c.className = 'card';
   c.innerHTML = `<img src="${BASE}${encodeURIComponent(item.img)}" alt="${item.hira}"><div class="labels"><div class="hira">${item.hira}</div><div class="zh">${item.zh}</div></div>`;
-  const a = new Audio(BASE + encodeURIComponent(item.wav));
   c.addEventListener('click', () => {
     c.classList.add('revealed','playing');
-    a.currentTime = 0; a.play();
+    const a = new Audio(BASE + encodeURIComponent(item.wav));
+    a.play();
     a.onended = () => c.classList.remove('playing');
   });
   g.appendChild(c);
