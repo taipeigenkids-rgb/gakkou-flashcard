@@ -73,11 +73,17 @@
     font-size: 16px;
     font-weight: 700;
     color: #333;
+    visibility: hidden;
   }
   .zh {
     font-size: 13px;
     color: #999;
     margin-top: 2px;
+    visibility: hidden;
+  }
+  .card.revealed .hira,
+  .card.revealed .zh {
+    visibility: visible;
   }
 </style>
 </head>
@@ -107,7 +113,7 @@ DATA.forEach(item => {
   c.innerHTML = `<img src="${item.img}" alt="${item.hira}"><div class="hira">${item.hira}</div><div class="zh">${item.zh}</div>`;
   const a = new Audio(item.wav);
   c.addEventListener('click', () => {
-    c.classList.add('playing');
+    c.classList.add('playing', 'revealed');
     a.currentTime = 0;
     a.play();
     a.onended = () => c.classList.remove('playing');
@@ -115,7 +121,7 @@ DATA.forEach(item => {
   g.appendChild(c);
 });
 function reset(){
-  document.querySelectorAll('.card').forEach(c => c.classList.remove('playing'));
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('playing', 'revealed'));
 }
 </script>
 </body>
